@@ -8,6 +8,10 @@ CXX=clang++
 
 COMPILE=$(CXX) $(CXXFLAGS)
 
+# EXECUTABLE_SOURCE:=src/main.cpp
+# TESTSUITE_SOURCE:=tests/test.cpp
+# COMMON_SOURCES:=$(filter-out $(EXECUTABLE_SOURCE) $(TESTSUITE_SOURCE),src/*.cpp tests/*.cpp)
+
 main: bin/main.out
 	$<
 
@@ -20,7 +24,7 @@ clean:
 bin/main.out: src/*.cpp
 	$(COMPILE) $^ -o $@
 
-bin/test.out: tests/*.cpp
+bin/test.out: $(filter-out src/main.cpp,$(wildcard src/*.cpp tests/*.cpp))
 	$(COMPILE) $^ -o $@
 
 gen: data/index.cpp
