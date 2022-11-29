@@ -33,11 +33,15 @@ public:
     CFG(std::string filename);
 
     void AddEdge(BasicBlock a, BasicBlock b);
+
     std::list<BasicBlock> GetAdjacent(BasicBlock b);
+
     // returns true if edge exists from a to b
     bool AreConnected(BasicBlock a, BasicBlock b);
 
     void PrintAdj();
+
+    std::vector<BasicBlock> ParseAssembly(std::string filename);
 private:
     std::map<BasicBlock,std::list<BasicBlock>> adj_;
     BasicBlock entryNode;
