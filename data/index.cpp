@@ -1,13 +1,17 @@
 int main() {
+    int x;
+    int y;
+    int z;
 
-    int value = 0;
-    if (value == 1) {
-        return 1;
+    x = 1;
+    y = x + 1;
+    if (x < y) {
+        x = y;
+    } else {
+        y = x;
+        x = x * 2;
     }
+    z = x + y;
 
-    for (int i = 0; i < 3; i++) {
-        i = i + 1;
-    }
-    
     return 0;
 }
