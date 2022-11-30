@@ -1,4 +1,4 @@
-INCLUDES=-I includes/ -I src/ -I tests/
+INCLUDES=-I includes/ -I src/ -I tests/ -I catch2/
 
 CXXFLAGS=-std=c++20 $(INCLUDES)
 
@@ -25,7 +25,7 @@ bin/main.out: src/*.cpp
 	$(COMPILE) $^ -o $@
 
 bin/test.out: $(filter-out src/main.cpp,$(wildcard src/*.cpp tests/*.cpp))
-	$(COMPILE) $^ -o $@
+	$(COMPILE) $^ catch2/catch_amalgamated.cpp -o $@
 
 gen: data/index.cpp
 	$(CXX) -S -mllvm --x86-asm-syntax=intel $< -o data/index.s

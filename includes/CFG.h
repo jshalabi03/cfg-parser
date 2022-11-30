@@ -19,7 +19,7 @@ struct BasicBlock {
     bool operator==(const BasicBlock &other) const;
     bool operator<(const BasicBlock &other) const;
 
-    std::vector<std::string> GetOutgoingLabels();
+    std::vector<std::string> GetOutgoingLabels() const;
 
     std::string label;
     std::vector<std::string> instructions;
@@ -45,7 +45,7 @@ public:
     void PrintKey();
 
     // populates key_
-    std::vector<BasicBlock> ParseAssembly(const std::string &filename);
+    void ParseAssembly(const std::string &filename);
 private:
     std::map<BasicBlock,std::list<BasicBlock>> adj_;
     BasicBlock entry_node_;

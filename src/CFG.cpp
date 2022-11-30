@@ -32,7 +32,7 @@ bool BasicBlock::operator<(const BasicBlock &other) const {
     return label < other.label;
 }
 
-std::vector<std::string> BasicBlock::GetOutgoingLabels() {
+std::vector<std::string> BasicBlock::GetOutgoingLabels() const {
     std::vector<std::string> res;
     for (const std::string &line : instructions) {
         auto pair = ParseUtil::GetInstruction(line);
@@ -54,26 +54,22 @@ std::ostream &operator<<(std::ostream &os, const BasicBlock &b) {
 CFG::CFG() { }
 
 CFG::CFG(const std::string &filename) {
-    std::vector<BasicBlock> blocks = ParseAssembly(filename);
+    ParseAssembly(filename);
     for (const auto &pair : key_) {
-        // unwrap
-        std::string label = pair.first;
-        BasicBlock b = pair.second;
-        std::vector<std::string> outgoing_labels = b.GetOutgoingLabels();
-        for (std::string label : outgoing_labels) {
-            AddEdge(b, key_[label]);
+        const auto&[label, block] = pair;
+        const std::vector<std::string> &outgoing_labels = block.GetOutgoingLabels();
+        for (const std::string &label : outgoing_labels) {
+            AddEdge(block, key_[label]);
         }
     }
 }
 
-std::vector<BasicBlock> CFG::ParseAssembly(const std::string &filename) {
-    std::vector<BasicBlock> result;
+void CFG::ParseAssembly(const std::string &filename) {
     std::vector<std::string> vec = ParseUtil::GetLines(filename);
     BasicBlock curr_block("HEADER");
     for (unsigned idx = 0; idx < vec.size(); ++idx) {
         std::string curr_line = ParseUtil::Clean(vec[idx]);
         if (ParseUtil::IsLabel(curr_line)) {
-            result.push_back(curr_block);
             key_[curr_block.label] = curr_block;
             curr_block = BasicBlock(ParseUtil::GetLabelString(curr_line));
             continue;
@@ -82,9 +78,8 @@ std::vector<BasicBlock> CFG::ParseAssembly(const std::string &filename) {
         if (!curr_line.empty())
             curr_block.instructions.push_back(curr_line);
     }
-    result.push_back(curr_block);
+
     key_[curr_block.label] = curr_block;
-    return result;
 }
 
 void CFG::AddEdge(BasicBlock a, BasicBlock b) {

@@ -1,17 +1,12 @@
 int main() {
-    int x;
-    int y;
-    int z;
-
-    x = 1;
-    y = x + 1;
-    if (x < y) {
-        x = y;
-    } else {
-        y = x;
-        x = x * 2;
+    int x = 3;
+    while (x < 5) {
+        x = x + 1;
     }
-    z = x + y;
+
+    if (x == 5) {
+        x = 0;
+    }
 
     return 0;
 }

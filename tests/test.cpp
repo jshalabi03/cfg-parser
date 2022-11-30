@@ -1,16 +1,15 @@
+#include "catch_amalgamated.hpp"
+
 #include <cassert>
+#include <iostream>
 
-#include "FileReader.h"
+#include "ParseUtil.h"
+#include "CFG.h"
 
-int main() {
-    
-    // FileReader Tests
-    {
-        FileReader fd;
-        std::vector<std::string> vec = fd.getLines("/workspaces/225FinalProject/data/a.s");
-        assert(vec.size() == 16);
-        assert(vec[9] == "\tmov	w0, #0");
-    }
+using std::cout, std::endl;
 
-    return 0;
+TEST_CASE("Test GetLines") {
+    std::vector<std::string> vec = ParseUtil::GetLines("/workspaces/225FinalProject/data/a.s");
+    REQUIRE(vec.size() == 16);
+    REQUIRE(vec[9] == "mov	w0, #0");
 }

@@ -9,32 +9,28 @@ main:                                   // @main
 	sub	sp, sp, #16
 	.cfi_def_cfa_offset 16
 	str	wzr, [sp, #12]
-	mov	w8, #1
+	mov	w8, #3
 	str	w8, [sp, #8]
+	b	.LBB0_1
+.LBB0_1:                                // =>This Inner Loop Header: Depth=1
+	ldr	w8, [sp, #8]
+	subs	w8, w8, #5
+	b.ge	.LBB0_3
+	b	.LBB0_2
+.LBB0_2:                                //   in Loop: Header=BB0_1 Depth=1
 	ldr	w8, [sp, #8]
 	add	w8, w8, #1
-	str	w8, [sp, #4]
-	ldr	w8, [sp, #8]
-	ldr	w9, [sp, #4]
-	subs	w8, w8, w9
-	b.ge	.LBB0_2
+	str	w8, [sp, #8]
 	b	.LBB0_1
-.LBB0_1:
-	ldr	w8, [sp, #4]
-	str	w8, [sp, #8]
-	b	.LBB0_3
-.LBB0_2:
-	ldr	w8, [sp, #8]
-	str	w8, [sp, #4]
-	ldr	w8, [sp, #8]
-	lsl	w8, w8, #1
-	str	w8, [sp, #8]
-	b	.LBB0_3
 .LBB0_3:
 	ldr	w8, [sp, #8]
-	ldr	w9, [sp, #4]
-	add	w8, w8, w9
-	str	w8, [sp]
+	subs	w8, w8, #5
+	b.ne	.LBB0_5
+	b	.LBB0_4
+.LBB0_4:
+	str	wzr, [sp, #8]
+	b	.LBB0_5
+.LBB0_5:
 	mov	w0, wzr
 	add	sp, sp, #16
 	ret
