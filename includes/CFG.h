@@ -39,6 +39,7 @@ public:
 
     // returns true if edge exists from a to b
     bool AreConnected(BasicBlock a, BasicBlock b);
+    bool AreConnected(std::string a, std::string b);
 
     void PrintAdj();
 

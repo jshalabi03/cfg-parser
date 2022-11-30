@@ -98,6 +98,15 @@ bool CFG::AreConnected(BasicBlock a, BasicBlock b) {
     return false;
 }
 
+bool CFG::AreConnected(std::string label_a, std::string label_b) {
+    BasicBlock a = key_[label_a], b = key_[label_b];
+    const std::list<BasicBlock> &adjacent = adj_[a];
+    for (const BasicBlock &block : adjacent) {
+        if (block == b) return true;
+    }
+    return false;
+}
+
 void CFG::PrintAdj() {
     for (const auto &pair : adj_) {
         std::cout << pair.first.label << ": ";

@@ -8,7 +8,7 @@ using namespace ParseUtil;
 
 int main(int argc, char* argv[]) {
     
-    CFG cfg("./data/index.s");
+    CFG cfg("/workspaces/225FinalProject/data/test.s");
     cfg.PrintAdj();
 
     return 0;
