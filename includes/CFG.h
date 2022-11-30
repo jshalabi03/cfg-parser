@@ -12,7 +12,7 @@ struct BasicBlock {
 
     BasicBlock();
     BasicBlock(std::string label);
-    BasicBlock(std::string label, std::vector<std::string> instructions, int lineNo);
+    BasicBlock(std::string label, std::vector<std::string> instructions);
     BasicBlock(const BasicBlock &other);
     
     BasicBlock &operator=(const BasicBlock &other);
@@ -21,7 +21,6 @@ struct BasicBlock {
 
     std::string label;
     std::vector<std::string> instructions;
-    int lineNo;
 };
 
 std::ostream &operator<<(std::ostream &os, const BasicBlock &b);
@@ -41,8 +40,14 @@ public:
 
     void PrintAdj();
 
+    void PrintKey();
+
+    // populates key_
     std::vector<BasicBlock> ParseAssembly(std::string filename);
 private:
     std::map<BasicBlock,std::list<BasicBlock>> adj_;
-    BasicBlock entryNode;
+    BasicBlock entry_node_;
+
+    // key_[label] returns basic block corresponding to label
+    std::unordered_map<std::string,BasicBlock> key_;
 };

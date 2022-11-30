@@ -5,38 +5,39 @@
 #include <iostream>
 
 BasicBlock::BasicBlock():
-    label("NULL"), instructions({}), lineNo(-1) { }
+    label("NULL"), instructions({}) { }
 
 BasicBlock::BasicBlock(std::string label):
     label(label) { }
 
 BasicBlock::BasicBlock(std::string label, 
-                       std::vector<std::string> instructions, 
-                       int lineNo):
-    label(label), instructions(instructions), lineNo(lineNo) { }
+                       std::vector<std::string> instructions):
+    label(label), instructions(instructions) { }
 
 BasicBlock::BasicBlock(const BasicBlock &other):
-    label(other.label), instructions(other.instructions), lineNo(other.lineNo) { }
+    label(other.label), instructions(other.instructions) { }
     
 BasicBlock &BasicBlock::operator=(const BasicBlock &other) {
     label = other.label;
     instructions = other.instructions;
-    lineNo = other.lineNo;
     return *this;
 }
 
 bool BasicBlock::operator==(const BasicBlock &other) const {
         return label == other.label 
-                && instructions == other.instructions
-                && lineNo == other.lineNo;
+                && instructions == other.instructions;
 }
 
 bool BasicBlock::operator<(const BasicBlock &other) const {
-    return lineNo < other.lineNo;
+    return label < other.label;
 }
 
 std::ostream &operator<<(std::ostream &os, const BasicBlock &b) {
-    return os << b.label;
+    os << b.label << '\n';
+    for (const std::string &instruction : b.instructions) {
+        os << '\t' << instruction << '\n';
+    }
+    return os;
 }
 
 CFG::CFG() { }
@@ -49,20 +50,22 @@ CFG::CFG(std::string filename) {
 
 std::vector<BasicBlock> CFG::ParseAssembly(std::string filename) {
     std::vector<BasicBlock> result;
-    std::vector<std::string> vec = GetLines(filename);
+    std::vector<std::string> vec = ParseUtil::GetLines(filename);
     BasicBlock curr_block("HEADER");
     for (unsigned idx = 0; idx < vec.size(); ++idx) {
-        std::string curr_line = Clean(vec[idx]);
-        if (IsLabel(curr_line)) {
+        std::string curr_line = ParseUtil::Clean(vec[idx]);
+        if (ParseUtil::IsLabel(curr_line)) {
             result.push_back(curr_block);
-            curr_block = BasicBlock(GetLabelString(curr_line));
+            key_[curr_block.label] = curr_block;
+            curr_block = BasicBlock(ParseUtil::GetLabelString(curr_line));
             continue;
         } 
-        
+
         if (!curr_line.empty())
             curr_block.instructions.push_back(curr_line);
     }
     result.push_back(curr_block);
+    key_[curr_block.label] = curr_block;
     return result;
 }
 
@@ -88,5 +91,12 @@ void CFG::PrintAdj() {
         for (const auto &block : pair.second)
             std::cout << block << ", ";
         std::cout << '\n';
+    }
+}
+
+void CFG::PrintKey() {
+    for (const auto &pair : key_) {
+        std::cout << pair.first << '\n';
+        std::cout << pair.second << "\n\n";
     }
 }
