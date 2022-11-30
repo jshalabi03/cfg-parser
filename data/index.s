@@ -15,7 +15,7 @@ main:                                   // @main
 	add	w8, w8, #1
 	str	w8, [sp, #4]
 	ldr	w8, [sp, #8]
-	ldr w9, [sp, #4]
+	ldr	w9, [sp, #4]
 	subs	w8, w8, w9
 	b.ge	.LBB0_2
 	b	.LBB0_1

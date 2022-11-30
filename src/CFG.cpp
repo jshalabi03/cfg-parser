@@ -32,6 +32,17 @@ bool BasicBlock::operator<(const BasicBlock &other) const {
     return label < other.label;
 }
 
+std::vector<std::string> BasicBlock::GetOutgoingLabels() {
+    std::vector<std::string> res;
+    for (const std::string &line : instructions) {
+        auto pair = ParseUtil::GetInstruction(line);
+        if (ParseUtil::IsJumpInstruction(pair.first)) {
+            res.push_back(pair.second);
+        }
+    }
+    return res;
+}
+
 std::ostream &operator<<(std::ostream &os, const BasicBlock &b) {
     os << b.label << '\n';
     for (const std::string &instruction : b.instructions) {
@@ -42,13 +53,20 @@ std::ostream &operator<<(std::ostream &os, const BasicBlock &b) {
 
 CFG::CFG() { }
 
-CFG::CFG(std::string filename) {
-
-    
-    
+CFG::CFG(const std::string &filename) {
+    std::vector<BasicBlock> blocks = ParseAssembly(filename);
+    for (const auto &pair : key_) {
+        // unwrap
+        std::string label = pair.first;
+        BasicBlock b = pair.second;
+        std::vector<std::string> outgoing_labels = b.GetOutgoingLabels();
+        for (std::string label : outgoing_labels) {
+            AddEdge(b, key_[label]);
+        }
+    }
 }
 
-std::vector<BasicBlock> CFG::ParseAssembly(std::string filename) {
+std::vector<BasicBlock> CFG::ParseAssembly(const std::string &filename) {
     std::vector<BasicBlock> result;
     std::vector<std::string> vec = ParseUtil::GetLines(filename);
     BasicBlock curr_block("HEADER");
@@ -87,9 +105,9 @@ bool CFG::AreConnected(BasicBlock a, BasicBlock b) {
 
 void CFG::PrintAdj() {
     for (const auto &pair : adj_) {
-        std::cout << pair.first << ": ";
+        std::cout << pair.first.label << ": ";
         for (const auto &block : pair.second)
-            std::cout << block << ", ";
+            std::cout << block.label << ", ";
         std::cout << '\n';
     }
 }

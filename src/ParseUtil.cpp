@@ -69,9 +69,11 @@ std::vector<std::string> GetLines(std::string filename) {
 
 std::pair<std::string,std::string> GetInstruction(const std::string &str) {
     std::string cpy(Trim(str));
-    size_t pos = cpy.find(' ');
+    size_t pos = cpy.find('\t');
+    if (pos == std::string::npos) pos = cpy.find(' ');
+
     if (pos == std::string::npos) {
-        std::cout << "HERE" << std::endl;
+        // std::cout << "HERE" << std::endl;
         return {cpy, ""};
     }
     else return {cpy.substr(0,pos), Trim(cpy.substr(pos))};

@@ -19,6 +19,8 @@ struct BasicBlock {
     bool operator==(const BasicBlock &other) const;
     bool operator<(const BasicBlock &other) const;
 
+    std::vector<std::string> GetOutgoingLabels();
+
     std::string label;
     std::vector<std::string> instructions;
 };
@@ -29,7 +31,7 @@ std::ostream &operator<<(std::ostream &os, const BasicBlock &b);
 class CFG {
 public:
     CFG();
-    CFG(std::string filename);
+    CFG(const std::string &filename);
 
     void AddEdge(BasicBlock a, BasicBlock b);
 
@@ -43,7 +45,7 @@ public:
     void PrintKey();
 
     // populates key_
-    std::vector<BasicBlock> ParseAssembly(std::string filename);
+    std::vector<BasicBlock> ParseAssembly(const std::string &filename);
 private:
     std::map<BasicBlock,std::list<BasicBlock>> adj_;
     BasicBlock entry_node_;
