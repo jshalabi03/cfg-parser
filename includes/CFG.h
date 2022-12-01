@@ -44,13 +44,13 @@ public:
     void PrintAdj();
 
     void PrintKey();
-
-    // populates key_
-    void ParseAssembly(const std::string &filename);
 private:
     std::map<BasicBlock,std::list<BasicBlock>> adj_;
     BasicBlock entry_node_;
 
     // key_[label] returns basic block corresponding to label
     std::unordered_map<std::string,BasicBlock> key_;
+
+    // populates key_
+    void ParseAssembly(const std::string &filename);
 };

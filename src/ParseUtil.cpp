@@ -51,7 +51,7 @@ std::string GetLabelString(const std::string &str) {
     return str.substr(0, str.length() - 1);
 }
 
-std::vector<std::string> GetLines(std::string filename) {
+std::vector<std::string> GetLines(const std::string &filename) {
     std::string line;
     std::vector<std::string> res;
 
@@ -69,44 +69,26 @@ std::vector<std::string> GetLines(std::string filename) {
 
 std::pair<std::string,std::string> GetInstruction(const std::string &str) {
     std::string cpy(Trim(str));
-    size_t pos = cpy.find('\t');
-    if (pos == std::string::npos) pos = cpy.find(' ');
+    size_t pos_a = cpy.find_last_of('\t');
+    size_t pos_b = cpy.find_last_of(' ');
+    size_t pos;
+    if (pos_a == std::string::npos) pos = pos_b;
+    else if (pos_b == std::string::npos) pos = pos_a;
+    else pos = std::max(pos_a,pos_b);
 
     if (pos == std::string::npos) {
-        // std::cout << "HERE" << std::endl;
         return {cpy, ""};
     }
     else return {cpy.substr(0,pos), Trim(cpy.substr(pos))};
 }
 
-// @param str - trimmed instruction string, no params
-// @returns true if instrution is a jump instruction, false otherwise
+
+// cbz, tbz, b, b.*, bl
 bool IsJumpInstruction(const std::string &str) {
+    if (str.length() >= 2 
+    && str[1] == 'b' && (str[0] == 'c' || str[0] == 't')) return true;
+    if (str == "bl") return true;
     return ((str.length() == 1 && str[0] == 'b')
      || (str.length() > 1 && str[0] == 'b' && str[1] == '.'));
 }
-
-// std::pair<std::string,std::vector<std::string>> GetInstructionDetails(const std::string &str) {
-//     string instruction;
-//     vector<string> params;
-
-//     size_t pos = str.find(' ');
-//     if (pos == string::npos) return {str, {}};
-
-//     instruction = str.substr(0,pos++);
-//     string curr_instruction;
-//     while (pos < str.length() && pos != string::npos) {
-//         if (str[pos] == ',') {
-//             params.push_back(curr_instruction);
-//             curr_instruction.clear();
-//             pos += 2;
-//         } else {
-//             curr_instruction += str[pos];
-//             ++pos;
-//         }
-//     }
-//     params.push_back(curr_instruction);
-//     return {instruction, params};
-// }
-
 };

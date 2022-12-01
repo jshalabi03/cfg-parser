@@ -59,6 +59,7 @@ CFG::CFG(const std::string &filename) {
         const auto&[label, block] = pair;
         const std::vector<std::string> &outgoing_labels = block.GetOutgoingLabels();
         for (const std::string &label : outgoing_labels) {
+            if (key_.find(label) == key_.end()) continue;
             AddEdge(block, key_[label]);
         }
     }
