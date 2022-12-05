@@ -41,6 +41,8 @@ public:
     bool AreConnected(BasicBlock a, BasicBlock b);
     bool AreConnected(std::string a, std::string b);
 
+    BasicBlock GetEntryNode() const;
+
     void PrintAdj();
 
     void PrintKey();

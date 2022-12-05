@@ -72,6 +72,7 @@ void CFG::ParseAssembly(const std::string &filename) {
         std::string curr_line = ParseUtil::Clean(vec[idx]);
         if (ParseUtil::IsLabel(curr_line)) {
             key_[curr_block.label] = curr_block;
+            if (curr_block.label == "main") entry_node_ = curr_block;
             curr_block = BasicBlock(ParseUtil::GetLabelString(curr_line));
             continue;
         } 
@@ -107,6 +108,10 @@ bool CFG::AreConnected(std::string label_a, std::string label_b) {
     }
     return false;
 }
+
+BasicBlock CFG::GetEntryNode() const {
+    return entry_node_;
+};
 
 void CFG::PrintAdj() {
     for (const auto &pair : adj_) {
