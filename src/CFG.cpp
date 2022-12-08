@@ -88,6 +88,10 @@ void CFG::AddEdge(BasicBlock a, BasicBlock b) {
     adj_[a].push_back(b);
 }
 
+void CFG::AddVertex(BasicBlock a) {
+    adj_[a] = std::list<BasicBlock>(); 
+}
+
 std::list<BasicBlock> CFG::GetAdjacent(BasicBlock b) {
     return adj_[b];
 }

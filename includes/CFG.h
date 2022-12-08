@@ -34,6 +34,7 @@ public:
     CFG(const std::string &filename);
 
     void AddEdge(BasicBlock a, BasicBlock b);
+    void AddVertex(BasicBlock a); 
 
     std::list<BasicBlock> GetAdjacent(BasicBlock b);
 
