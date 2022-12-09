@@ -7,6 +7,8 @@
 #include <list>
 #include <iostream>
 
+class DFSTree;
+
 // Basic block, i.e. sequentially executed instructions
 struct BasicBlock {
 
@@ -36,7 +38,7 @@ public:
     void AddEdge(BasicBlock a, BasicBlock b);
     void AddVertex(BasicBlock a); 
 
-    std::list<BasicBlock> GetAdjacent(BasicBlock b);
+    std::list<BasicBlock> GetAdjacent(BasicBlock b) const;
 
     // returns true if edge exists from a to b
     bool AreConnected(BasicBlock a, BasicBlock b);
@@ -47,6 +49,10 @@ public:
     void PrintAdj();
 
     void PrintKey();
+
+    DFSTree GenerateDFSTree() const;
+
+    int NumConnectedComponents() const;
 private:
     std::map<BasicBlock,std::list<BasicBlock>> adj_;
     BasicBlock entry_node_;

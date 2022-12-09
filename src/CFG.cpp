@@ -1,8 +1,9 @@
 #include "CFG.h"
-
+#include "DFSTree.h"
 #include "ParseUtil.h"
 
 #include <iostream>
+#include <stack>
 
 BasicBlock::BasicBlock():
     label("NULL"), instructions({}) { }
@@ -92,8 +93,9 @@ void CFG::AddVertex(BasicBlock a) {
     adj_[a] = std::list<BasicBlock>(); 
 }
 
-std::list<BasicBlock> CFG::GetAdjacent(BasicBlock b) {
-    return adj_[b];
+std::list<BasicBlock> CFG::GetAdjacent(BasicBlock b) const {
+    if (adj_.find(b) == adj_.end()) return std::list<BasicBlock>();
+    return adj_.at(b);
 }
 
 bool CFG::AreConnected(BasicBlock a, BasicBlock b) {
@@ -131,4 +133,65 @@ void CFG::PrintKey() {
         std::cout << pair.first << '\n';
         std::cout << pair.second << "\n\n";
     }
+}
+
+int CFG::NumConnectedComponents() const {
+    int ans = 0;
+    std::map<BasicBlock,int> visited;
+    std::stack<BasicBlock> s;
+    s.push(entry_node_);
+    while (!s.empty()) {
+        BasicBlock top = s.top();
+        s.pop();
+        visited[top] = 1;
+        for (const BasicBlock &neighbor : GetAdjacent(top)) {
+            if (!visited[neighbor]) s.push(neighbor);
+        }
+
+        if (!s.empty()) continue;
+        ++ans;
+        for (const auto &pair : adj_) {
+            BasicBlock from = pair.first;
+            if (!visited[from]) {
+                s.push(from);
+                break;
+            }
+        }
+    }
+    return ans;
+}
+
+DFSTree CFG::GenerateDFSTree() const {
+    DFSTree dfs;
+    dfs.entry_node_ = this->entry_node_;
+    std::deque<std::pair<BasicBlock,BasicBlock>> s;
+    for (const BasicBlock &neighbor : GetAdjacent(entry_node_)) {
+        s.push_front({ neighbor, entry_node_ });
+    }
+    std::map<BasicBlock,int> visited;
+    dfs.SetLabel(entry_node_, 1);
+    int dfs_label = 2;
+    while (!s.empty()) {
+        std::pair<BasicBlock,BasicBlock> pair = s.back();
+        BasicBlock curr = pair.first;
+        BasicBlock predecessor = pair.second;
+        s.pop_back();
+
+        if (visited[curr]) continue;
+        visited[curr] = 1;
+
+        dfs.AddEdge(predecessor, curr);
+        dfs.SetLabel(curr, dfs_label++);
+
+        std::stack<std::pair<BasicBlock,BasicBlock>> tmp;
+        for (const BasicBlock &neighbor : GetAdjacent(curr)) {
+            tmp.push({neighbor,curr});
+        }
+        while (!tmp.empty()) {
+            s.push_back(tmp.top());
+            tmp.pop();
+        }
+    }
+
+    return dfs;
 }
