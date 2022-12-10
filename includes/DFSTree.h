@@ -13,6 +13,8 @@ public:
     void PrintLabelling();
 
     int GetMaxLabel() const;
+    void PopulatePredecessorKey();
+    void PrintPredecessorKey();
     BasicBlock GetSemidominator(BasicBlock b);
     std::map<BasicBlock, BasicBlock> ComputeSemidominators();
 private:

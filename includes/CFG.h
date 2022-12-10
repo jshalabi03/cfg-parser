@@ -55,7 +55,7 @@ public:
     DominatorTree GenerateDominatorTree() const;
 
     int NumConnectedComponents() const;
-private:
+protected:
     std::map<BasicBlock,std::list<BasicBlock>> adj_;
     BasicBlock entry_node_;
 

@@ -193,14 +193,13 @@ DFSTree CFG::GenerateDFSTree() const {
             tmp.pop();
         }
     }
-
+    dfs.PopulatePredecessorKey();
     return dfs;
 }
 
 DominatorTree CFG::GenerateDominatorTree() const {
     DominatorTree dom_tree;
     DFSTree dfs_tree = this->GenerateDFSTree();
-    
 
     return dom_tree;
 }

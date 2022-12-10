@@ -1,6 +1,9 @@
 #include "DFSTree.h"
 
+#include <stack>
+#include <list>
 #include <stdexcept>
+#include <iostream>
 
 DFSTree::DFSTree() { }
 
@@ -27,6 +30,36 @@ void DFSTree::PrintLabelling() {
 
 int DFSTree::GetMaxLabel() const {
     return max_label_;
+}
+
+void DFSTree::PopulatePredecessorKey() {
+    std::stack<std::pair<BasicBlock,std::list<BasicBlock>>> s;
+    s.push({entry_node_, {}});
+    std::map<BasicBlock,int> visited;
+    while (!s.empty()) {
+        auto top = s.top();
+        BasicBlock curr = top.first;
+        s.pop();
+        if (visited[curr]) continue;
+        visited[curr] = 1;
+        std::list<BasicBlock> predecessors = top.second;
+        predecessor_key_[curr] = predecessors;
+        predecessors.push_back(curr);
+        for (const auto &neighbor : adj_[curr]) {
+            if (!visited[neighbor])
+                s.push({neighbor, predecessors});
+        }
+    }
+}
+
+void DFSTree::PrintPredecessorKey() {
+    for (const auto &pair : predecessor_key_) {
+        std::cout << pair.first.label << ": ";
+        for (const auto &block : pair.second) {
+            std::cout << block.label << ", ";
+        }
+        std::cout << '\n';
+    }
 }
 
 BasicBlock DFSTree::GetSemidominator(BasicBlock b) {
