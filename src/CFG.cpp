@@ -1,5 +1,6 @@
 #include "CFG.h"
 #include "DFSTree.h"
+#include "DominatorTree.h"
 #include "ParseUtil.h"
 
 #include <iostream>
@@ -194,4 +195,12 @@ DFSTree CFG::GenerateDFSTree() const {
     }
 
     return dfs;
+}
+
+DominatorTree CFG::GenerateDominatorTree() const {
+    DominatorTree dom_tree;
+    DFSTree dfs_tree = this->GenerateDFSTree();
+    
+
+    return dom_tree;
 }

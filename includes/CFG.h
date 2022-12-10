@@ -8,6 +8,7 @@
 #include <iostream>
 
 class DFSTree;
+class DominatorTree;
 
 // Basic block, i.e. sequentially executed instructions
 struct BasicBlock {
@@ -51,6 +52,7 @@ public:
     void PrintKey();
 
     DFSTree GenerateDFSTree() const;
+    DominatorTree GenerateDominatorTree() const;
 
     int NumConnectedComponents() const;
 private:

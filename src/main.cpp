@@ -12,9 +12,9 @@ int main(int argc, char* argv[]) {
     CFG cfg("/workspaces/225FinalProject/data/index.s");
     DFSTree dfs_tree = cfg.GenerateDFSTree();
 
-    cfg.PrintAdj();
-    cout << "\n\n\n";
-    dfs_tree.PrintAdj();
+    // cfg.PrintAdj();
+    // cout << "\n\n\n";
+    // dfs_tree.PrintAdj();
 
     dfs_tree.PrintLabelling();
 
