@@ -5,6 +5,9 @@
 
 #include <iostream>
 #include <stack>
+#include <set> 
+
+using namespace std; 
 
 BasicBlock::BasicBlock():
     label("NULL"), instructions({}) { }
@@ -205,3 +208,34 @@ DominatorTree CFG::GenerateDominatorTree() const {
 
     return dom_tree;
 }
+
+std::vector<BasicBlock> CFG::DFS(){
+   stack<BasicBlock> DFS_stack;
+   BasicBlock start = GetEntryNode();
+ 
+   std::set<string> visited; //make set
+   //mark all as false
+ 
+   std::vector<BasicBlock> ret;
+ 
+   DFS_stack.push(start);
+ 
+   while(!DFS_stack.empty()){
+       BasicBlock top = DFS_stack.top();
+       DFS_stack.pop();
+       ret.push_back(top); 
+       visited.insert(top.label);
+       list<BasicBlock> adj_nodes = GetAdjacent(top);
+ 
+       for(auto block : adj_nodes) {
+           if (!visited.count(block.label)) {
+               DFS_stack.push(block);
+           }
+       }
+   }
+ 
+   return ret;
+}
+ 
+ 
+
