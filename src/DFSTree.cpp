@@ -18,8 +18,8 @@ void DFSTree::SetLabel(BasicBlock b, int label) {
     reverse_labelling_[label] = b;
 }
 
-void DFSTree::SetPredecessors(BasicBlock node, std::list<BasicBlock> predecessors) {
-    predecessor_key_[node] = predecessors;
+void DFSTree::SetAncestors(BasicBlock node, std::list<BasicBlock> ancestors) {
+    ancestor_key_[node] = ancestors;
 }
 
 void DFSTree::PrintLabelling() {
@@ -32,7 +32,7 @@ int DFSTree::GetMaxLabel() const {
     return max_label_;
 }
 
-void DFSTree::PopulatePredecessorKey() {
+void DFSTree::PopulateAncestorKey() {
     std::stack<std::pair<BasicBlock,std::list<BasicBlock>>> s;
     s.push({entry_node_, {}});
     std::map<BasicBlock,int> visited;
@@ -42,18 +42,18 @@ void DFSTree::PopulatePredecessorKey() {
         s.pop();
         if (visited[curr]) continue;
         visited[curr] = 1;
-        std::list<BasicBlock> predecessors = top.second;
-        predecessor_key_[curr] = predecessors;
-        predecessors.push_back(curr);
+        std::list<BasicBlock> ancestors = top.second;
+        ancestor_key_[curr] = ancestors;
+        ancestors.push_back(curr);
         for (const auto &neighbor : adj_[curr]) {
             if (!visited[neighbor])
-                s.push({neighbor, predecessors});
+                s.push({neighbor, ancestors});
         }
     }
 }
 
-void DFSTree::PrintPredecessorKey() {
-    for (const auto &pair : predecessor_key_) {
+void DFSTree::PrintAncestorKey() {
+    for (const auto &pair : ancestor_key_) {
         std::cout << pair.first.label << ": ";
         for (const auto &block : pair.second) {
             std::cout << block.label << ", ";
@@ -63,19 +63,35 @@ void DFSTree::PrintPredecessorKey() {
 }
 
 BasicBlock DFSTree::GetSemidominator(BasicBlock b) {
+    // The semidominator of the root is the root itself
     if (b == GetEntryNode()) 
-        throw std::runtime_error("Cannot compute semidominator of entry node.");
+        return b;
 
-    BasicBlock semi(b);
-    for (int label = max_label_; label > 1; --label) {
+    BasicBlock sdom(b);
+    
 
-    }
-
-    return semi;
+    return sdom;
 }
 
 std::map<BasicBlock, BasicBlock> DFSTree::ComputeSemidominators() {
     std::map<BasicBlock,BasicBlock> mp;
 
     return mp;
+}
+
+void DFSTree::AddPredecessor(BasicBlock node, BasicBlock pred) {
+    pred_[node].push_back(pred);
+}
+
+BasicBlock DFSTree::AncestorWithLowestSemi(BasicBlock label) {
+
+}
+
+void DFSTree::PrintPredecessors() {
+    for (const auto &pair : pred_) {
+        std::cout << pair.first.label << ": ";
+        for (const auto &pred : pair.second)
+            std::cout << pred.label << ", ";
+        std::cout << '\n';
+    }
 }

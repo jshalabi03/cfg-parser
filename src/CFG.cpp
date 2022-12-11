@@ -177,6 +177,8 @@ DFSTree CFG::GenerateDFSTree() const {
         BasicBlock curr = pair.first;
         BasicBlock predecessor = pair.second;
         s.pop_back();
+        
+        dfs.AddPredecessor(curr, predecessor);
 
         if (visited[curr]) continue;
         visited[curr] = 1;
@@ -193,7 +195,7 @@ DFSTree CFG::GenerateDFSTree() const {
             tmp.pop();
         }
     }
-    dfs.PopulatePredecessorKey();
+    dfs.PopulateAncestorKey();
     return dfs;
 }
 
