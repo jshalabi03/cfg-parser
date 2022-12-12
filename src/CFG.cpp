@@ -185,6 +185,7 @@ DFSTree CFG::GenerateDFSTree() const {
         s.push_front({ neighbor, entry_node_ });
     }
     std::map<BasicBlock,int> visited;
+    dfs.SetSemi(entry_node_, 1);
     dfs.SetLabel(entry_node_, 1);
     int dfs_label = 2;
     while (!s.empty()) {
@@ -199,6 +200,7 @@ DFSTree CFG::GenerateDFSTree() const {
         visited[curr] = 1;
 
         dfs.AddEdge(predecessor, curr);
+        dfs.SetSemi(curr, dfs_label);
         dfs.SetLabel(curr, dfs_label++);
 
         std::stack<std::pair<BasicBlock,BasicBlock>> tmp;
@@ -211,6 +213,7 @@ DFSTree CFG::GenerateDFSTree() const {
         }
     }
     dfs.PopulateAncestorKey();
+    dfs.max_label_ = dfs_label;
     return dfs;
 }
 
@@ -322,6 +325,9 @@ int CFG::Dijkstras(BasicBlock start, BasicBlock end) {
     return -1; 
 }
 
+int CFG::Dijkstras(std::string start, std::string end) {
+    return Dijkstras(key_[start], key_[end]);
+}
  
  
 

@@ -61,6 +61,8 @@ public:
     std::vector<BasicBlock> DFS();
 
     int Dijkstras(BasicBlock start, BasicBlock end); 
+    int Dijkstras(std::string start, std::string end); 
+
 protected:
     // for each basic block, holds a list of all adjacent nodes
     std::map<BasicBlock,std::list<BasicBlock>> adj_;
