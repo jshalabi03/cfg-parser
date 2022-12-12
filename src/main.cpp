@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
             for (const auto &block : dfs) {
                 cout << block.label << " -> ";
             }
-            cout << '\n';
+            cout << "NULL\n";
 
         } else if (option == 2) {
 
