@@ -4,7 +4,7 @@
 
 For our Data Structures final project, we decided to explore LLVM assembly hierarchy and structure. We came in with the questions which blocks of code dominate which others and the shortest path between blocks of code in assembly instructions. We quickly realized we could answer these questions by implementing a graph class, setting the assembly labels as vertices, and their jump instructions as edges. 
 
-With this graph implementation we determined the top three algorithms which would help us answer our leading questions. We decided to implement Depth-First Search, Dijstrka’s algorithm and Lengauer-Tarjan’s algorithm. We have included a brief summary of each algorithm below, with our results and correctness.
+With this graph implementation we determined the top three algorithms which would help us answer our leading questions. We decided to implement Depth-First Search, Dijstrka’s algorithm and Lengauer-Tarjan’s algorithm. We have included a brief summary of each algorithm below, with our results and correctness at the end of the report.
 
 ### Graph Implementation
 
