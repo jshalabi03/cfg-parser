@@ -8,6 +8,8 @@
 
 using std::cout, std::endl;
 
+
+// Testing control flow graph
 CFG cfg("/workspaces/225FinalProject/data/test.s");
 
 
