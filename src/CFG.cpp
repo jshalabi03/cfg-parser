@@ -325,6 +325,9 @@ int CFG::Dijkstras(BasicBlock start, BasicBlock end) {
     return -1; 
 }
 
+int CFG::Dijkstras(std::string start, std::string end) {
+    return Dijkstras(key_[start], key_[end]);
+}
  
  
 
