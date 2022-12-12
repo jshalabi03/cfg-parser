@@ -2,7 +2,7 @@
 Justin Kim, Jacob Shalabi, Kenny Kim, Ben Kim 
 
 
-#Organization:
+# Organization:
 
 Written Portion:
 
@@ -17,7 +17,7 @@ In the data folder you can find the assembly code examples which we use as well 
 lastly, our written test cases can be found in the tests folder
 
 
-#Running Instructions:
+# Running Instructions:
 
 Installation:
 
