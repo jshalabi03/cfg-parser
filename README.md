@@ -24,11 +24,17 @@ Lastly, our written test cases can be found in the "tests" folder.
 
 Installation:
 
-First, locally clone this repository, at https://github.com/jshalabi03/cfg-parser
-Open the project directory in the dev container given by the Dockerfile
-Edit the data/index.cpp file with a compilable C++ program whose entry function is labelled main.
-Run 'make gen' to generate data/index.s, which contains the llvm ARM assembly generated instructions from data/index.cpp
-Finally, run 'make' to run the command line application which will prompt various information queries on the parsed control flow graph.
+1. First, locally clone this repository, at https://github.com/jshalabi03/cfg-parser
+
+2. Open the project directory in the dev container given by the Dockerfile. 
+
+3. Verify that you are in the root directory of the project before continuing.
+
+3. Edit the data/index.cpp file with a compilable C++ program whose entry function is labelled main.
+
+4. Run 'make gen' to generate data/index.s, which contains the LLVM ARM assembly generated instructions from data/index.cpp
+
+5. Finally, run 'make' to run the command line application which will prompt various information queries on the parsed control flow graph.
 
 Testing: 
 
