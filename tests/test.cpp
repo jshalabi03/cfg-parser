@@ -8,6 +8,9 @@
 
 using std::cout, std::endl;
 
+CFG cfg("/workspaces/225FinalProject/data/test.s");
+
+
 TEST_CASE("Test GetLines") {
     std::vector<std::string> vec = ParseUtil::GetLines("/workspaces/225FinalProject/data/test.s");
     REQUIRE(vec.size() == 162);
@@ -20,8 +23,6 @@ TEST_CASE("Test Trim") {
 }
 
 TEST_CASE("Test CFG Construction") {
-    CFG cfg("/workspaces/225FinalProject/data/test.s");
-
     std::string label_main = "main",
                 label_1 = ".LBB5_1",
                 label_2 = ".LBB5_2",
@@ -32,6 +33,7 @@ TEST_CASE("Test CFG Construction") {
                 label_f2 = "_Z2f2i",
                 label_nc = "_Z10not_calledi";
 
+    
     REQUIRE(cfg.GetAdjacent(label_main).size() == 4);
     REQUIRE(cfg.GetAdjacent(label_1).size() == 1);
     REQUIRE(cfg.GetAdjacent(label_2).size() == 2);
@@ -61,8 +63,6 @@ TEST_CASE("Test CFG Construction") {
 }
 
 TEST_CASE("Test DFS") {
-    CFG cfg("/workspaces/225FinalProject/data/test.s");
-
     std::vector<BasicBlock> dfs = cfg.DFS();
 
     std::vector<std::string> expected_traversal = {
@@ -87,9 +87,6 @@ TEST_CASE("Test DFS") {
 }
 
 TEST_CASE("Test Dijkstras") {
-
-    CFG cfg("/workspaces/225FinalProject/data/test.s");
-
     std::string label_main = "main",
                 label_1 = ".LBB5_1",
                 label_2 = ".LBB5_2",
@@ -105,9 +102,29 @@ TEST_CASE("Test Dijkstras") {
     REQUIRE(cfg.Dijkstras(label_1, label_nc) == 3);
 
     REQUIRE(cfg.Dijkstras(label_2, label_f1) == -1);
-
 }
 
-TEST_CASE("Test Lengaur-Tarjan") {
+TEST_CASE("Test Lengauer-Tarjan") {
+    std::string label_main = "main",
+                label_1 = ".LBB5_1",
+                label_2 = ".LBB5_2",
+                label_3 = ".LBB5_3",
+                label_4 = ".LBB5_4",
+                label_f0 = "_Z2f0i",
+                label_f1 = "_Z2f1i",
+                label_f2 = "_Z2f2i",
+                label_nc = "_Z10not_calledi";
     
+    REQUIRE(cfg.GetImmediateDominator(label_main) == BasicBlock());
+
+    REQUIRE(cfg.GetImmediateDominator(label_f0).label == label_main);
+    REQUIRE(cfg.GetImmediateDominator(label_f1).label == label_main);
+    REQUIRE(cfg.GetImmediateDominator(label_f2).label == label_main);
+    REQUIRE(cfg.GetImmediateDominator(label_2).label == label_main);
+    REQUIRE(cfg.GetImmediateDominator(label_1).label == label_main);
+
+    REQUIRE(cfg.GetImmediateDominator(label_4).label == label_2);
+    REQUIRE(cfg.GetImmediateDominator(label_3).label == label_2);
+
+    REQUIRE(cfg.GetImmediateDominator(label_nc).label == label_3);
 }
