@@ -14,7 +14,7 @@ The respective .h files are in the "includes" folder.
 
 In the "data" folder you can find the assembly code examples which we use as well as the cpp code used to generate the assembly.
 
-lastly, our written test cases can be found in the "tests" folder
+lastly, our written test cases can be found in the "tests" folder.
 
 
 # Running Instructions:
