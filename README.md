@@ -25,4 +25,8 @@ First Locally clone this repository, at ___
 
 Testing: 
 
-To run our implemented tests, 
+To run our implemented tests, go into the directory 
+
+cd /
+
+and run ./test
