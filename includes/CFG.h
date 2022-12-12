@@ -46,6 +46,7 @@ public:
     bool AreConnected(std::string a, std::string b);
 
     BasicBlock GetEntryNode() const;
+    BasicBlock GetBlock(std::string label); 
 
     void PrintAdj();
 
@@ -56,8 +57,12 @@ public:
 
     int NumConnectedComponents() const;
 
+    // runs a DFS traversal outputting a vector of Basic Blocks
     std::vector<BasicBlock> DFS();
+
+    int Dijkstras(BasicBlock start, BasicBlock end); 
 protected:
+    // for each basic block, holds a list of all adjacent nodes
     std::map<BasicBlock,std::list<BasicBlock>> adj_;
     BasicBlock entry_node_;
 
@@ -66,4 +71,5 @@ protected:
 
     // populates key_
     void ParseAssembly(const std::string &filename);
+
 };

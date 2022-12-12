@@ -6,6 +6,9 @@
 #include <iostream>
 #include <stack>
 #include <set> 
+#include <bits/stdc++.h>
+#include <queue> 
+#include <map> 
 
 using namespace std; 
 
@@ -123,6 +126,15 @@ BasicBlock CFG::GetEntryNode() const {
     return entry_node_;
 };
 
+BasicBlock CFG::GetBlock(std::string label) {
+    if (key_.find(label) == key_.end()) {
+        return BasicBlock(); 
+    } else {
+        return key_[label]; 
+    }
+}
+
+
 void CFG::PrintAdj() {
     for (const auto &pair : adj_) {
         std::cout << pair.first.label << ": ";
@@ -211,31 +223,105 @@ DominatorTree CFG::GenerateDominatorTree() const {
 
 std::vector<BasicBlock> CFG::DFS(){
    stack<BasicBlock> DFS_stack;
+
+   // The entry node is the first node in the CFG
    BasicBlock start = GetEntryNode();
  
-   std::set<string> visited; //make set
-   //mark all as false
+   std::set<BasicBlock> visited; 
+   // make set of nodes
+   // which will be used to keep track of the visited nodes
  
    std::vector<BasicBlock> ret;
  
    DFS_stack.push(start);
  
    while(!DFS_stack.empty()){
+    // takes the first value off the stack and adds it to 
+    // the vector to return and adds the label to the visited set
        BasicBlock top = DFS_stack.top();
        DFS_stack.pop();
        ret.push_back(top); 
-       visited.insert(top.label);
+
+       // gets all adjacent nodes to the Basic Block
        list<BasicBlock> adj_nodes = GetAdjacent(top);
  
        for(auto block : adj_nodes) {
-           if (!visited.count(block.label)) {
-               DFS_stack.push(block);
+           if (!visited.count(block)) {
+            // adding to stack if not visited
+            // and marking it visited
+                DFS_stack.push(block);
+                visited.insert(block);
            }
        }
    }
  
    return ret;
 }
+
+int CFG::Dijkstras(BasicBlock start, BasicBlock end) {
+    // dummy basic block for all the blocks to point to as a predecessor
+    BasicBlock dummy = BasicBlock("dummy"); 
+
+    // map to keep track of distances
+    map<BasicBlock, int> dist; 
+
+    // map to keep track of the predecessors
+    map<BasicBlock, BasicBlock> pred; 
+
+    set<BasicBlock> visited; 
+
+    for (auto p : adj_) {
+        //setting all the Basic Blocks in our CFG with 
+        //the max possible distance
+        dist[p.first] = INT_MAX; 
+        pred[p.first] = dummy; 
+    }
+    // set the distance of the start node to zero
+    // and inserts start into the visited set 
+    dist[start] = 0; 
+    visited.insert(start); 
+    
+    // this is the queue that we will be using for Dijkstras
+    // it does not need to be a heap/priority queue since the CFG is unweighted
+    // this provides with a runtime of O(V + E) instead of O(E + VlogV)
+    queue<BasicBlock> q; 
+    q.push(start); 
+
+    // iterates until the queue become empty or until we found the shortest path
+    while(!q.empty()) {
+        BasicBlock b = q.front(); 
+        q.pop(); 
+        
+        // gets all adjacent nodes to the Basic Block
+        list<BasicBlock> adj_nodes = GetAdjacent(b); 
+
+        for (auto block : adj_nodes) {
+            // checks to see if the block was visited
+            if (!visited.count(block)) {
+                visited.insert(block); 
+
+                // sets it to the traversed distance + 1
+                // marks the predecessor of the curr block
+                // push the node into the queue
+                dist[block] = dist[b] + 1; 
+                pred[block] = b; 
+                q.push(block); 
+
+                // We can stop this dijkstras once we found
+                // the end node
+
+                if (block == end) {
+                    return dist[block]; 
+                }
+            }
+        }
+    }
+
+    // function returns -1 if dijkstras cannot find a path
+    // between the starting and end nodes
+    return -1; 
+}
+
  
  
 
