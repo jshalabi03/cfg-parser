@@ -60,6 +60,32 @@ TEST_CASE("Test CFG Construction") {
     REQUIRE(cfg.AreConnected(label_3, label_nc));
 }
 
+TEST_CASE("Test DFS") {
+    CFG cfg("/workspaces/225FinalProject/data/test.s");
+
+    std::vector<BasicBlock> dfs = cfg.DFS();
+
+    std::vector<std::string> expected_traversal = {
+        "main",
+        ".LBB5_1",
+        ".LBB5_2",
+        ".LBB5_3",
+        "_Z10not_calledi",
+        ".LBB5_4",
+        "_Z2f1i",
+        "_Z2f2i",
+        "_Z2f0i"
+    };
+
+    int len = dfs.size();
+    REQUIRE(len == expected_traversal.size());
+
+    for (int idx = 0; idx < len; ++idx) {
+        REQUIRE(dfs[idx].label == expected_traversal[idx]);
+    }
+    
+}
+
 TEST_CASE("Test Dijkstras") {
 
     CFG cfg("/workspaces/225FinalProject/data/test.s");
