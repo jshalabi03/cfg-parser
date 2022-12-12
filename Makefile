@@ -16,7 +16,7 @@ main: bin/main.out
 	$<
 
 test: bin/test.out
-	$<
+	
 
 clean:
 	rm -f bin/*

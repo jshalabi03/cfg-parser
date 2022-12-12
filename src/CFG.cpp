@@ -1,5 +1,4 @@
 #include "CFG.h"
-#include "DFSTree.h"
 #include "ParseUtil.h"
 
 #include <iostream>
@@ -14,8 +13,8 @@ using namespace std;
 BasicBlock::BasicBlock():
     label("NULL"), instructions({}) { }
 
-BasicBlock::BasicBlock(std::string label):
-    label(label) { }
+BasicBlock::BasicBlock(std::string label, int id):
+    label(label), id(id) { }
 
 BasicBlock::BasicBlock(std::string label, 
                        std::vector<std::string> instructions):
@@ -70,17 +69,38 @@ CFG::CFG(const std::string &filename) {
             AddEdge(block, key_[label]);
         }
     }
+
+    // Erase keys that are not apart of graph, populate id_, reverse_id_
+    int idx = 0;
+    for (auto it = key_.begin(); it != key_.end();) {
+        BasicBlock b = it->second;
+        if (adj_.find(b) == adj_.end()
+            && pred_.find(b) == pred_.end()) {
+                auto next = std::next(it);
+                key_.erase(it);
+                it = next;
+        } else {
+            id_[it->second.label] = idx++;
+            reverse_id_.push_back(it->second.label);
+            ++it;
+        }
+
+    }
+
+    num_nodes_ = reverse_id_.size();
+    idom_rels_ = this->ComputeImmediateDominators();
 }
 
 void CFG::ParseAssembly(const std::string &filename) {
     std::vector<std::string> vec = ParseUtil::GetLines(filename);
-    BasicBlock curr_block("HEADER");
+    int id = 0;
+    BasicBlock curr_block("HEADER", id++);
     for (unsigned idx = 0; idx < vec.size(); ++idx) {
         std::string curr_line = ParseUtil::Clean(vec[idx]);
         if (ParseUtil::IsLabel(curr_line)) {
             key_[curr_block.label] = curr_block;
             if (curr_block.label == "main") entry_node_ = curr_block;
-            curr_block = BasicBlock(ParseUtil::GetLabelString(curr_line));
+            curr_block = BasicBlock(ParseUtil::GetLabelString(curr_line), id++);
             continue;
         } 
 
@@ -93,6 +113,7 @@ void CFG::ParseAssembly(const std::string &filename) {
 
 void CFG::AddEdge(BasicBlock a, BasicBlock b) {
     adj_[a].push_back(b);
+    pred_[b].push_back(a);
 }
 
 void CFG::AddVertex(BasicBlock a) {
@@ -102,6 +123,21 @@ void CFG::AddVertex(BasicBlock a) {
 std::list<BasicBlock> CFG::GetAdjacent(BasicBlock b) const {
     if (adj_.find(b) == adj_.end()) return std::list<BasicBlock>();
     return adj_.at(b);
+}
+
+std::list<BasicBlock> CFG::GetAdjacent(std::string b) const {
+    if (key_.find(b) == key_.end()) return std::list<BasicBlock>();
+    return GetAdjacent(key_.at(b));
+}
+
+std::list<BasicBlock> CFG::GetPredecessors(BasicBlock b) const {
+    if (pred_.find(b) == pred_.end()) return std::list<BasicBlock>();
+    return pred_.at(b);
+}
+
+std::list<BasicBlock> CFG::GetPredecessors(std::string b) const {
+    if (key_.find(b) == key_.end()) return std::list<BasicBlock>();
+    return GetPredecessors(key_.at(b));
 }
 
 bool CFG::AreConnected(BasicBlock a, BasicBlock b) {
@@ -133,9 +169,17 @@ BasicBlock CFG::GetBlock(std::string label) {
     }
 }
 
-
 void CFG::PrintAdj() {
     for (const auto &pair : adj_) {
+        std::cout << pair.first.label << ": ";
+        for (const auto &block : pair.second)
+            std::cout << block.label << ", ";
+        std::cout << '\n';
+    }
+}
+
+void CFG::PrintPred() {
+    for (const auto &pair : pred_) {
         std::cout << pair.first.label << ": ";
         for (const auto &block : pair.second)
             std::cout << block.label << ", ";
@@ -146,7 +190,13 @@ void CFG::PrintAdj() {
 void CFG::PrintKey() {
     for (const auto &pair : key_) {
         std::cout << pair.first << '\n';
-        std::cout << pair.second << "\n\n";
+        // std::cout << pair.second << "\n\n";
+    }
+}
+
+void CFG::PrintIDs() {
+    for (const auto &pair : key_) {
+        std::cout << pair.first << ": " << pair.second.id << '\n';
     }
 }
 
@@ -176,51 +226,132 @@ int CFG::NumConnectedComponents() const {
     return ans;
 }
 
-DFSTree CFG::GenerateDFSTree() const {
-    DFSTree dfs;
-    dfs.entry_node_ = this->entry_node_;
-    std::deque<std::pair<BasicBlock,BasicBlock>> s;
-    for (const BasicBlock &neighbor : GetAdjacent(entry_node_)) {
-        s.push_front({ neighbor, entry_node_ });
-    }
-    std::map<BasicBlock,int> visited;
-    dfs.SetSemi(entry_node_, 1);
-    dfs.SetLabel(entry_node_, 1);
-    int dfs_label = 2;
-    while (!s.empty()) {
-        std::pair<BasicBlock,BasicBlock> pair = s.back();
-        BasicBlock curr = pair.first;
-        BasicBlock predecessor = pair.second;
-        s.pop_back();
-        
-        dfs.AddPredecessor(curr, predecessor);
+std::map<BasicBlock,BasicBlock> CFG::ComputeImmediateDominators() {
+    // maps ids to set of possible semidom ids
+    std::vector<std::set<int>> bucket_(num_nodes_);
+    // maps id to id of semidom
+    std::vector<int> semi_(num_nodes_, -1);
+    // maps id to id of immediate ancestor in dfs tree
+    std::vector<int> ancestor_(num_nodes_, -1);
+    // maps id to ids of nodes with same semidom
+    std::vector<int> samedom_(num_nodes_, -1);
+    // maps id to current best minimum semidom
+    std::vector<int> best_(num_nodes_, -1);
+    // maps ids to dfs num
+    std::vector<int> dfnum_(num_nodes_, 0);
+    // maps dfs num to vertex
+    std::vector<int> vertex_(num_nodes_, -1);
+    // maps id to parent id
+    std::vector<int> parent_(num_nodes_, -1);
+    // maps id to id of immediate dominator
+    std::vector<int> idom_(num_nodes_, -1);
 
-        if (visited[curr]) continue;
-        visited[curr] = 1;
+    // DFS Tree Label Generation
+    int N = 0;
+    std::deque<std::pair<int,int>> stack;
+    stack.push_back({-1, id_["main"]});
+    while (!stack.empty()) {
+        std::pair<int,int> pair = stack.back();
+        int p = pair.first;
+        int n = pair.second;
+        stack.pop_back();
+        if (dfnum_[n] != 0) continue;
+        dfnum_[n] = N;
+        vertex_[N] = n;
+        parent_[n] = p;
+        ++N;
 
-        dfs.AddEdge(predecessor, curr);
-        dfs.SetSemi(curr, dfs_label);
-        dfs.SetLabel(curr, dfs_label++);
-
-        std::stack<std::pair<BasicBlock,BasicBlock>> tmp;
-        for (const BasicBlock &neighbor : GetAdjacent(curr)) {
-            tmp.push({neighbor,curr});
+        std::stack<std::pair<int,int>> tmp;
+        for (const auto &block : adj_[key_[reverse_id_[n]]]) {
+            tmp.push({n, id_[block.label]});
         }
         while (!tmp.empty()) {
-            s.push_back(tmp.top());
+            stack.push_back(tmp.top());
             tmp.pop();
         }
     }
-    dfs.PopulateAncestorKey();
-    dfs.max_label_ = dfs_label - 1;
-    return dfs;
-}
 
-DFSTree CFG::GenerateDominatorTree() const {
-    DFSTree dom_tree;
-    DFSTree dfs_tree = this->GenerateDFSTree();
+    // Lambda expression to return dfs tree 
+    // ancestor with lowest semidominator value
+    std::function<int(int)> AncestorWithLowestSemi = [&](int v) -> int {
+        int a = ancestor_.at(v);
+        if (ancestor_.at(a) >= 0) {
+            int b = AncestorWithLowestSemi(a);
+            ancestor_.at(b) = ancestor_.at(a);
+            if (dfnum_.at(semi_.at(b)) < dfnum_.at(semi_.at(best_.at(v)))) {
+                best_.at(v) = b;
+            }
+        }
+        return best_.at(v);
+    };
 
-    return dom_tree;
+    // Lambda expression to link parent node to child
+    std::function<void(int,int)> Link = [&](int p, int n) -> void {
+        ancestor_.at(n) = p;
+        best_.at(n) = n;
+    };
+
+    auto invalid_node_err = std::runtime_error("Invalid node.");
+
+    for (int i = N-1; i >= 0; --i) {
+        int n = vertex_.at(i);
+        int p = parent_.at(n);
+        int s = p;
+
+        // If node's key doesn't exist, throw error
+        if (key_.find(reverse_id_.at(n)) == key_.end()) {
+            cout << "key\n";
+            throw invalid_node_err;
+        }
+
+        // If node doesn't have any CFG predecessors, i.e. entry node, skip
+        if (pred_.find(key_.at(reverse_id_.at(n))) == pred_.end()) {
+            continue;
+        }
+
+        for (BasicBlock block : pred_.at(key_.at(reverse_id_.at(n)))) {
+            int v = id_.at(block.label);
+
+            int sPrime = dfnum_.at(v) <= dfnum_.at(n)
+                ? v
+                : semi_.at(AncestorWithLowestSemi(v));
+
+            if (dfnum_.at(sPrime) < dfnum_.at(s)) {
+                s = sPrime;
+            }
+        }
+
+        semi_.at(n) = s;
+        bucket_.at(s).insert(n);
+        Link(p,n);
+
+        for (int v : bucket_.at(p)) {
+            int y = AncestorWithLowestSemi(v);
+            // if semi(y) == semi(v), idom(v) = semi(n)
+            if (semi_.at(y) == semi_.at(v)) {
+                idom_.at(v) = p;
+            } else {
+                samedom_.at(v) = y;
+            }
+        }
+        bucket_.at(p).clear();
+    }
+
+    // if semi(y) != semi(n), idom(n) = idom(y)
+    for (int i = 0; i < N; ++i) {
+        int n = vertex_.at(i);
+        if (samedom_.at(n) >= 0) {
+            idom_.at(n) = idom_.at(samedom_.at(n));
+        }
+    }
+
+    // converts idom_ id map to basicblock map, return result
+    std::map<BasicBlock,BasicBlock> idom_relationships;
+    for (int i = 0; i < idom_.size(); ++i) {
+        idom_relationships[key_[reverse_id_[i]]] = key_[reverse_id_[idom_[i]]];
+    }
+
+    return idom_relationships;
 }
 
 std::vector<BasicBlock> CFG::DFS(){
@@ -262,7 +393,7 @@ std::vector<BasicBlock> CFG::DFS(){
 
 int CFG::Dijkstras(BasicBlock start, BasicBlock end) {
     // dummy basic block for all the blocks to point to as a predecessor
-    BasicBlock dummy = BasicBlock("dummy"); 
+    BasicBlock dummy = BasicBlock("dummy", -1); 
 
     // map to keep track of distances
     map<BasicBlock, int> dist; 
@@ -328,5 +459,12 @@ int CFG::Dijkstras(std::string start, std::string end) {
     return Dijkstras(key_[start], key_[end]);
 }
  
- 
+BasicBlock CFG::GetImmediateDominator(BasicBlock b) {
+    if (idom_rels_.find(b) == idom_rels_.end()) return BasicBlock();
+    return idom_rels_.at(b);
+}
+
+BasicBlock CFG::GetImmediateDominator(std::string b) {
+    return GetImmediateDominator(key_[b]);
+}
 
