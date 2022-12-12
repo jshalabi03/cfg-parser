@@ -107,3 +107,7 @@ TEST_CASE("Test Dijkstras") {
     REQUIRE(cfg.Dijkstras(label_2, label_f1) == -1);
 
 }
+
+TEST_CASE("Test Lengaur-Tarjan") {
+    
+}

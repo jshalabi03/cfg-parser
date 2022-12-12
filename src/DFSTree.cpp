@@ -11,8 +11,6 @@ DFSTree::DFSTree() { }
 
 DFSTree::DFSTree(const std::string filename): CFG(filename) {
     *this = this->GenerateDFSTree();
-    for (const auto &pair : labelling_)
-        max_label_ = std::max(max_label_, pair.second);
 }
 
 void DFSTree::SetLabel(BasicBlock b, int label) {
@@ -64,23 +62,6 @@ void DFSTree::PrintAncestorKey() {
     }
 }
 
-BasicBlock DFSTree::GetSemidominator(BasicBlock b) {
-    // The semidominator of the root is the root itself
-    if (b == GetEntryNode()) 
-        return b;
-
-    BasicBlock sdom(b);
-    
-
-    return sdom;
-}
-
-std::map<BasicBlock, BasicBlock> DFSTree::ComputeSemidominators() {
-    std::map<BasicBlock,BasicBlock> mp;
-
-    return mp;
-}
-
 void DFSTree::AddPredecessor(BasicBlock node, BasicBlock pred) {
     pred_[node].push_back(pred);
 }
@@ -104,7 +85,7 @@ void DFSTree::PrintPredecessors() {
 }
 
 void DFSTree::LengauerTarjan() {
-    for (int i = max_label_; i >= 0; --i) {
+    for (int i = max_label_; i >= 1; --i) {
         BasicBlock n = reverse_labelling_[i];
         BasicBlock p = ancestor_key_[n].back();
         BasicBlock s = p;

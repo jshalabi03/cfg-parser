@@ -1,6 +1,5 @@
 #include "CFG.h"
 #include "DFSTree.h"
-#include "DominatorTree.h"
 #include "ParseUtil.h"
 
 #include <iostream>
@@ -213,12 +212,12 @@ DFSTree CFG::GenerateDFSTree() const {
         }
     }
     dfs.PopulateAncestorKey();
-    dfs.max_label_ = dfs_label;
+    dfs.max_label_ = dfs_label - 1;
     return dfs;
 }
 
-DominatorTree CFG::GenerateDominatorTree() const {
-    DominatorTree dom_tree;
+DFSTree CFG::GenerateDominatorTree() const {
+    DFSTree dom_tree;
     DFSTree dfs_tree = this->GenerateDFSTree();
 
     return dom_tree;

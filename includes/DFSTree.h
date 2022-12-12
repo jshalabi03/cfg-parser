@@ -19,8 +19,6 @@ public:
     void PopulateAncestorKey();
     void PrintAncestorKey();
     void PrintPredecessors();
-    BasicBlock GetSemidominator(BasicBlock b);
-    std::map<BasicBlock, BasicBlock> ComputeSemidominators();
 
     void PrintIDom();
 

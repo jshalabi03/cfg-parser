@@ -53,7 +53,7 @@ public:
     void PrintKey();
 
     DFSTree GenerateDFSTree() const;
-    DominatorTree GenerateDominatorTree() const;
+    DFSTree GenerateDominatorTree() const;
 
     int NumConnectedComponents() const;
 
