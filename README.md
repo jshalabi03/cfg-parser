@@ -38,4 +38,4 @@ Installation:
 
 Testing: 
 
-To run our implemented tests, run 'make test'
+1. To run our implemented tests, run 'make test'
