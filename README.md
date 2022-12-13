@@ -4,7 +4,7 @@ Justin Kim, Jacob Shalabi, Kenny Kim, Ben Kim
 
 # Organization:
 
-Our presentation video is linked at : _____
+Our presentation video is linked at: https://www.youtube.com/watch?v=nrXluFdkXdM
 
 Our team contract, Written Report, and Project Proposal can be found in the "docs" folder.
 
